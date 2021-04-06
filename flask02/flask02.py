@@ -14,7 +14,7 @@ app = Flask(__name__)  # create an app
 def index():
     a_user = {'name': 'Jenna', 'email': 'jbath@uncc.edu'}
 
-    return render_template("index.html", user=a_user)
+    return render_template("index.html", user = a_user)
 
 
 app.run(host=os.getenv('IP', '127.0.0.1'), port=int(os.getenv('PORT', 5000)), debug=True)
