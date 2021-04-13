@@ -2,9 +2,14 @@
 
 # imports
 import os  # os is used to get environment variables IP & PORT
-from flask import Flask, render_template, request  # Flask is the web app that we will customize
+from flask import Flask, render_template, request, url_for, redirect  # Flask is the web app that we will customize
 
 app = Flask(__name__)  # create an app
+
+notes = {1: {'title': 'First note', 'text': 'This is my first note', 'date': '10-1-2020'},
+         2: {'title': 'Second note', 'text': 'This is my second note', 'date': '10-2-2020'},
+         3: {'title': 'Third note', 'text': 'This is my third note', 'date': '10-3-2020'}
+         }
 
 
 # @app.route is a decorator. It gives the function "index" special powers.
@@ -13,45 +18,46 @@ app = Flask(__name__)  # create an app
 @app.route('/index')
 def index():
     a_user = {'name': 'Jenna', 'email': 'jbath@uncc.edu'}
-    return render_template("index.html", user = a_user)
+    return render_template("index.html", user=a_user)
 
 
 @app.route('/notes')
 def get_notes():
     a_user = {'name': 'Jenna', 'email': 'jbath@uncc.edu'}
-    notes = {1: {'title': 'First note', 'text': 'This is my first note', 'date': '10-1-2020'},
-             2: {'title': 'Second note', 'text': 'This is my second note', 'date': '10-2-2020'},
-             3: {'title': 'Third note', 'text': 'This is my third note', 'date': '10-3-2020'}
-             }
-    return render_template('notes.html', notes=notes, user = a_user)
+    return render_template('notes.html', notes=notes, user=a_user)
 
 
 @app.route('/notes/<note_id>')
 def get_note(note_id):
     a_user = {'name': 'Jenna', 'email': 'jbath@uncc.edu'}
-    notes = {1: {'title': 'First note', 'text': 'This is my first note', 'date': '10-1-2020'},
-             2: {'title': 'Second note', 'text': 'This is my second note', 'date': '10-2-2020'},
-             3: {'title': 'Third note', 'text': 'This is my third note', 'date': '10-3-2020'}
-             }
-    return render_template('note.html', user = a_user, note=notes[int(note_id)])
+    return render_template('note.html', user=a_user, note=notes[int(note_id)])
 
 
 @app.route('/notes/new', methods=['GET', 'POST'])
 def new_note():
-     a_user = {'name': 'Jenna', 'email': 'jbath@uncc.edu'}
+    a_user = {'name': 'Jenna', 'email': 'jbath@uncc.edu'}
 
-     print('request method is', request.method)
-     if request.method == 'POST':
-         request_data = request.form
-         return f"data: {request_data}!"
-     else:
+    if request.method == 'POST':
+
+        title = request.form['title']
+
+        text = request.form['noteText']
+
+        from datetime import date
+        today = date.today()
+
+        today = today.strftime("%m-%d-%Y")
+
+        id = len(notes) + 1
+
+        notes[id] = {'title': title, 'text': text, 'date': today}
+
+        return redirect(url_for('get_notes', name = a_user))
+    else:
         return render_template('new.html', user=a_user)
 
 
 app.run(host=os.getenv('IP', '127.0.0.1'), port=int(os.getenv('PORT', 5000)), debug=True)
-
-
-
 
 # To see the web page in your web browser, go to the url,
 #   http://127.0.0.1:5000/index
